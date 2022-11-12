@@ -1,30 +1,46 @@
-import axios from "axios";
-const BASE_URL_API = "https://pixabay.com/api/";
 
-export class searchQuery {
-    static key = '30573200-e6482719e2878fad01ed65176';
-    static orientation = 'horizontal';
-    static query = '';
-    static page = 1;
-    static min_width = 320;
-    static image_type = "photo";
-    static per_page = 40;
-    static async searchPictures(query = '') {
-    if(query.trim()) searchQuery.query = query;
+import Notiflix from 'notiflix';
 
-    const config = {
-        params: {
-            key: searchQuery.key,
-            orientation: searchQuery.orientation,
-            q: searchQuery.query,
-            page: searchQuery.page,
-            min_width: searchQuery.min_width,
-            image_type: searchQuery.image_type,
-            per_page: searchQuery.per_page
-        }
+const axios = require('axios').default;
+
+export let lastIndexPage = 1;
+
+
+export async function fetchImages(name, page) {
+  try {
+    const response = await axios.get(`https://pixabay.com/api/`, {
+      method: 'get',
+      params: {
+        key: '31279594-d7f31148a9794d6f86efa6037',
+        q: name,
+        image_type: 'photo',
+        orientation: 'horizontal',
+        safesearch: true,
+        per_page: 40,
+        page: page,
+      },
+    });
+
+    if (response.data.totalHits === 0) {
+      Notiflix.Notify.failure(
+        'Sorry, there are no images matching your search query. Please try again.'
+      );
+      return;
     }
 
-    const response = await axios.get(`${BASE_URL_API}`, config);
+    if (response.data.totalHits > 0 && page === 1)
+      Notiflix.Notify.success(
+        `Hooray! We found ${response.data.totalHits} images.`
+      );
+
+    if (response.data.totalHits % 40 === 0) {
+      lastIndexPage = response.data.totalHits / 40;
+    } else {
+      lastIndexPage = Math.floor(response.data.totalHits / 40) + 1;
+    }
+
     return response.data;
-    }
+  } catch (error) {
+    console.log(error);
+  }
 }
