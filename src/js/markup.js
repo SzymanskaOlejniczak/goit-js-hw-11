@@ -10,10 +10,9 @@ const gallery = document.querySelector('.gallery');
 export function renderImages(images) {
   const markup = images
     .map(image => {
-      return `<div class="photo-card">
-                  <a class="gallery__item" href="${image.largeImageURL}">
-                    <img class="gallery__image" src="${image.webformatURL}" alt="${image.tags}" loading="lazy"/>
-                  </a>
+      return `<a class="gallery__link" href="${image.largeImageURL}">
+                <div class="gallery-item">
+                    <img class="gallery-item__img" src="${image.webformatURL}" alt="${image.tags}" loading="lazy"/>
                   <div class="info">
                     <p class="info-item">
                       <b>Likes</b><br>
@@ -32,7 +31,8 @@ export function renderImages(images) {
                       ${image.downloads}
                     </p>
                   </div>
-              </div>`;
+                </div>
+              </a>`;
     })
     .join('');
   gallery.insertAdjacentHTML('beforeend', markup);
